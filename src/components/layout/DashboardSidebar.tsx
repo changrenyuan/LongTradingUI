@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { LayoutDashboard, PieChart, List, Settings, Activity, TrendingUp, Star } from 'lucide-react'
+import { LayoutDashboard, PieChart, List, Settings, Activity, TrendingUp, Star, Bug } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 const navigation = [
@@ -12,6 +12,7 @@ const navigation = [
   { name: '关注', href: '/watchlist', icon: Star },
   { name: '策略', href: '/settings', icon: Settings },
   { name: '日志', href: '/logs', icon: Activity },
+  { name: '调测', href: '/debug', icon: Bug },
 ]
 
 export function DashboardSidebar() {

@@ -200,22 +200,25 @@ export interface CreateOrderParams {
 //                              API 客户端
 // ============================================================================
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000'
+// 后端直接访问地址（用于服务端或本地开发）
+const BACKEND_URL = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000'
+
+// 代理路径：所有请求通过 Next.js API 代理转发，解决跨域问题
+const PROXY_PREFIX = '/api/proxy'
 
 class ApiClient {
-  private baseUrl: string
-
-  constructor(baseUrl: string = API_BASE_URL) {
-    this.baseUrl = baseUrl
-  }
-
+  /**
+   * 统一使用代理路由，避免跨域问题
+   * 前端请求 /api/proxy/api/v1/xxx -> Next.js 代理 -> http://backend/api/v1/xxx
+   */
+  
   // -----------------------------------
   //         核心请求方法
   // -----------------------------------
 
   /**
-   * 通用请求方法
-   * @param endpoint 接口路径
+   * 通用请求方法（通过代理转发）
+   * @param endpoint 接口路径，如 /api/v1/ledger/assets
    * @param options 请求选项
    * @returns 响应数据或null
    */
@@ -224,7 +227,10 @@ class ApiClient {
     options: RequestInit = {}
   ): Promise<T | null> {
     try {
-      const response = await fetch(`${this.baseUrl}${endpoint}`, {
+      // 使用代理路由转发请求
+      const url = `${PROXY_PREFIX}${endpoint}`
+      
+      const response = await fetch(url, {
         headers: {
           'Content-Type': 'application/json',
           ...options.headers,
@@ -570,6 +576,82 @@ class ApiClient {
     residual_risk: number
   } | null> {
     return this.request('/api/v1/backtest/risk_attribution')
+  }
+
+  // ============================================================================
+  //                              调测模块
+  // ============================================================================
+
+  /**
+   * 获取可调试的数据文件列表
+   */
+  async getDebugFiles(): Promise<{
+    filename: string
+    display_name: string
+    exists: boolean
+    size: number
+  }[] | null> {
+    return this.request('/api/v1/debug/files')
+  }
+
+  /**
+   * 获取指定 JSON 文件内容
+   * @param filename 文件名
+   */
+  async getDebugFile(filename: string): Promise<{
+    filename: string
+    content: Record<string, unknown> | null
+    error: string | null
+  } | null> {
+    return this.request(`/api/v1/debug/file/${filename}`)
+  }
+
+  /**
+   * 触发数据同步
+   */
+  async debugSync(): Promise<{
+    success: boolean
+    message: string
+    timestamp?: string
+  } | null> {
+    return this.request('/api/v1/debug/sync', { method: 'POST' })
+  }
+
+  /**
+   * 获取账本对比结果
+   */
+  async getDebugCompare(): Promise<{
+    system_only: Array<{ symbol: string; data: Record<string, unknown> }>
+    manual_only: Array<{ symbol: string; data: Record<string, unknown> }>
+    diff_positions: Array<{ symbol: string; name: string; diff: Record<string, { system: unknown; manual: unknown }> }>
+    match_positions: string[]
+  } | null> {
+    return this.request('/api/v1/debug/compare')
+  }
+
+  /**
+   * 同步市场快照
+   */
+  async syncMarketSnapshot(): Promise<{
+    success: boolean
+    message: string
+    symbols?: string[]
+    name_map?: Record<string, string>
+    timestamp?: string
+  } | null> {
+    return this.request('/api/v1/debug/market_snapshot', { method: 'POST' })
+  }
+
+  /**
+   * 获取市场快照数据
+   */
+  async getMarketSnapshot(): Promise<{
+    success: boolean
+    message: string
+    data: Array<Record<string, unknown>>
+    count: number
+  } | null> {
+    return this.request('/api/v1/debug/market_snapshot')
   }
 }
 
