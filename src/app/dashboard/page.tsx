@@ -162,7 +162,7 @@ export default function DashboardPage() {
           {/* 页面标题和操作按钮 */}
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold">MT_Alpha 量化指挥中心</h1>
+              <h1 className="text-3xl font-bold">LongT 量化交易A版</h1>
               <p className="text-muted-foreground">实时监控策略执行与资产状况</p>
             </div>
             <div className="flex gap-2">

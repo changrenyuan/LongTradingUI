@@ -23,8 +23,8 @@ export function DashboardSidebar() {
       <div className="flex items-center gap-3 border-b px-6 py-4">
         <TrendingUp className="h-6 w-6 text-primary" />
         <div>
-          <h1 className="font-bold text-lg">MT_Alpha</h1>
-          <p className="text-xs text-muted-foreground">量化交易指挥中心</p>
+          <h1 className="font-bold text-lg">LongT 量化</h1>
+          <p className="text-xs text-muted-foreground">策略中心</p>
         </div>
       </div>
 
